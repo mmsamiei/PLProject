@@ -19,8 +19,25 @@
 (struct munit   ()      #:transparent) ;; unit value -- good for ending a list
 (struct ismunit (e)     #:transparent) ;; if e1 is unit then 1 else 0
 
+
 ;; a closure is not in "source" programs; it is what functions evaluate to
 (struct closure (env fun) #:transparent) 
+
+;; ######################## I add this
+
+(struct var (string) #:transparent)
+(struct mult  (e1 e2)  #:transparent)  ;; mult two expressions
+(struct neg  (e)  #:transparent)  ;; neg one expressions
+(struct islthan  (e1 e2)  #:transparent)
+(struct ifzero  (e1 e2 e3)  #:transparent)
+(struct ifgthan  (e1 e2 e3 e4)  #:transparent)
+(struct mlet  (s e1 e2)  #:transparent)
+(struct apair  (e1 e2)  #:transparent)
+(struct first  (e)  #:transparent)
+(struct second  (e)  #:transparent)
+
+;; ######################## I added that
+
 
 ;; Problem 1
 
@@ -33,8 +50,8 @@
 ;; Complete this function
 (define (envlookup env str)
   (cond [(null? env) (error "unbound variable during evaluation" str)]
-  		"CHANGE" 
-		)
+  		;"CHANGE" 
+		))
 
 ;; Do NOT change the two cases given to you.  
 ;; DO add more cases for other kinds of NUMEX expressions.
@@ -43,6 +60,13 @@
 (define (eval-under-env e env)
   (cond [(var? e) 
          (envlookup env (var-string e))]
+        [(int? e)
+         ;; Error handling - Type THREE ;;
+         (let ([v (int-num e)])
+           (if (integer? v)
+               e
+               (error "const should be an integer")))
+         ]
         [(add? e) 
          (let ([v1 (eval-under-env (add-e1 e) env)]
                [v2 (eval-under-env (add-e2 e) env)])
@@ -51,6 +75,8 @@
                (int (+ (int-num v1) 
                        (int-num v2)))
                (error "NUMEX addition applied to non-number")))]
+        [(pair? e)
+         ]
         ;; CHANGE add more cases here
         [#t (error (format "bad NUMEX expression: ~v" e))]))
 
