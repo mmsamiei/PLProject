@@ -75,7 +75,10 @@
                (int (+ (int-num v1) 
                        (int-num v2)))
                (error "NUMEX addition applied to non-number")))]
-        [(pair? e)
+        [(first? e)
+         (let ([p (first-e e)])
+         (if (apair? p)(apair-e1 p)
+             (error "NUMEX first applied to non-pair" e)))
          ]
         ;; CHANGE add more cases here
         [#t (error (format "bad NUMEX expression: ~v" e))]))
