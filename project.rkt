@@ -41,8 +41,21 @@
 
 ;; Problem 1
 
-(define (racketlist->numexlist xs) "CHANGE")
-(define (numexlist->racketlist xs) "CHANGE")
+(define (racketlist->numexlist xs)
+  (cond 
+      [(not(null? xs)) (apair (car xs) (racketlist->numexlist (cdr xs)))]
+      [#t null]
+  )
+)
+
+
+(define (numexlist->racketlist xs)
+  (cond 
+      [(not(null? xs)) (cons (eval-exp(first xs)) (numexlist->racketlist (second xs)))]
+      [#t null]
+  )
+)
+
 
 ;; Problem 2
 
