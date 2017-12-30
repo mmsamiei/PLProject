@@ -75,11 +75,23 @@
                (int (+ (int-num v1) 
                        (int-num v2)))
                (error "NUMEX addition applied to non-number")))]
-        [(first? e)
-         (let ([p (first-e e)])
-         (if (apair? p)(apair-e1 p)
-             (error "NUMEX first applied to non-pair" e)))
-         ]
+        [(apair? e)
+         e]
+        
+        [(first? e)  
+         (let ([p (eval-under-env (first-e e) env)])
+
+           (if (apair? p)
+               (apair-e1 p)
+               (error "NUMEX first applied to non-pair" e)))]
+        
+        [(second? e)  
+         (let ([p (eval-under-env (second-e e) env)])
+
+           (if (apair? p)
+               (apair-e2 p)
+               (error "NUMEX second applied to non-pair" e)))]
+        
         ;; CHANGE add more cases here
         [#t (error (format "bad NUMEX expression: ~v" e))]))
 
