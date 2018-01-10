@@ -51,7 +51,7 @@
 
 (define (numexlist->racketlist xs)
   (cond 
-      [(not(null? xs)) (cons (eval-exp(first xs)) (numexlist->racketlist (second xs)))]
+      [(not(null? xs)) (cons (eval-exp(first xs)) (numexlist->racketlist (eval-exp(second xs))))]
       [#t null]
   )
 )
@@ -88,6 +88,35 @@
                (int (+ (int-num v1) 
                        (int-num v2)))
                (error "NUMEX addition applied to non-number")))]
+
+        [(mult? e) 
+         (let ([v1 (eval-under-env (mult-e1 e) env)]
+               [v2 (eval-under-env (mult-e2 e) env)])
+           (if (and (int? v1)
+                    (int? v2))
+               (int (* (int-num v1) 
+                       (int-num v2)))
+               (error "NUMEX multiplaction applied to non-number")))]
+
+
+        [(neg? e) 
+         (let ([v (eval-under-env (neg-e e) env)])
+           (if (int? v)
+               (int (- (int-num v)))
+               (error "negate applied to non-number")))]
+
+        
+        [(islthan? e) 
+         (let ([v1 (eval-under-env (islthan-e1 e) env)]
+               [v2 (eval-under-env (islthan-e2 e) env)])
+           (if (and (int? v1)
+                    (int? v2))
+               (if(< (int-num v1) (int-num v2))
+                  (int 1)
+                  (int 0))
+               (error "NUMEX multiplaction applied to non-number")))]
+
+        
         [(apair? e)
          e]
         
