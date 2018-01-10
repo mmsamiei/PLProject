@@ -63,7 +63,8 @@
 ;; Complete this function
 (define (envlookup env str)
   (cond [(null? env) (error "unbound variable during evaluation" str)]
-  		;"CHANGE" 
+  		[(equal? (car (car env))str) (cdr (car env))]
+                [else (envlookup (cdr env ) str)]
 		))
 
 ;; Do NOT change the two cases given to you.  
@@ -133,6 +134,13 @@
            (if (apair? p)
                (apair-e2 p)
                (error "NUMEX second applied to non-pair" e)))]
+
+
+        [(mlet? e)
+         (let ([p (eval-under-env (mlet-e1 e) env)])
+           
+         (eval-under-env (mlet-e2 e) (cons(cons (mlet-s e) p) env )))
+         ]
         
         ;; CHANGE add more cases here
         [#t (error (format "bad NUMEX expression: ~v" e))]))

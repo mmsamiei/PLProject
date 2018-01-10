@@ -19,13 +19,43 @@
 (struct munit   ()      #:transparent) ;; unit value -- good for ending a list
 (struct ismunit (e)     #:transparent) ;; if e1 is unit then 1 else 0
 
+
 ;; a closure is not in "source" programs; it is what functions evaluate to
 (struct closure (env fun) #:transparent) 
 
+;; ######################## I add this
+
+(struct var (string) #:transparent)
+(struct mult  (e1 e2)  #:transparent)  ;; mult two expressions
+(struct neg  (e)  #:transparent)  ;; neg one expressions
+(struct islthan  (e1 e2)  #:transparent)
+(struct ifzero  (e1 e2 e3)  #:transparent)
+(struct ifgthan  (e1 e2 e3 e4)  #:transparent)
+(struct mlet  (s e1 e2)  #:transparent)
+(struct apair  (e1 e2)  #:transparent)
+(struct first  (e)  #:transparent)
+(struct second  (e)  #:transparent)
+
+;; ######################## I added that
+
+
 ;; Problem 1
 
-(define (racketlist->numexlist xs) "CHANGE")
-(define (numexlist->racketlist xs) "CHANGE")
+(define (racketlist->numexlist xs)
+  (cond 
+      [(not(null? xs)) (apair (car xs) (racketlist->numexlist (cdr xs)))]
+      [#t null]
+  )
+)
+
+
+(define (numexlist->racketlist xs)
+  (cond 
+      [(not(null? xs)) (cons (eval-exp(first xs)) (numexlist->racketlist (eval-exp(second xs))))]
+      [#t null]
+  )
+)
+
 
 ;; Problem 2
 
@@ -33,8 +63,8 @@
 ;; Complete this function
 (define (envlookup env str)
   (cond [(null? env) (error "unbound variable during evaluation" str)]
-  		"CHANGE" 
-		)
+  		;"CHANGE" 
+		))
 
 ;; Do NOT change the two cases given to you.  
 ;; DO add more cases for other kinds of NUMEX expressions.
@@ -43,6 +73,13 @@
 (define (eval-under-env e env)
   (cond [(var? e) 
          (envlookup env (var-string e))]
+        [(int? e)
+         ;; Error handling - Type THREE ;;
+         (let ([v (int-num e)])
+           (if (integer? v)
+               e
+               (error "const should be an integer")))
+         ]
         [(add? e) 
          (let ([v1 (eval-under-env (add-e1 e) env)]
                [v2 (eval-under-env (add-e2 e) env)])
@@ -51,6 +88,52 @@
                (int (+ (int-num v1) 
                        (int-num v2)))
                (error "NUMEX addition applied to non-number")))]
+
+        [(mult? e) 
+         (let ([v1 (eval-under-env (mult-e1 e) env)]
+               [v2 (eval-under-env (mult-e2 e) env)])
+           (if (and (int? v1)
+                    (int? v2))
+               (int (* (int-num v1) 
+                       (int-num v2)))
+               (error "NUMEX multiplaction applied to non-number")))]
+
+
+        [(neg? e) 
+         (let ([v (eval-under-env (neg-e e) env)])
+           (if (int? v)
+               (int (- (int-num v)))
+               (error "negate applied to non-number")))]
+
+        
+        [(islthan? e) 
+         (let ([v1 (eval-under-env (islthan-e1 e) env)]
+               [v2 (eval-under-env (islthan-e2 e) env)])
+           (if (and (int? v1)
+                    (int? v2))
+               (if(< (int-num v1) (int-num v2))
+                  (int 1)
+                  (int 0))
+               (error "NUMEX multiplaction applied to non-number")))]
+
+        
+        [(apair? e)
+         e]
+        
+        [(first? e)  
+         (let ([p (eval-under-env (first-e e) env)])
+
+           (if (apair? p)
+               (apair-e1 p)
+               (error "NUMEX first applied to non-pair" e)))]
+        
+        [(second? e)  
+         (let ([p (eval-under-env (second-e e) env)])
+
+           (if (apair? p)
+               (apair-e2 p)
+               (error "NUMEX second applied to non-pair" e)))]
+        
         ;; CHANGE add more cases here
         [#t (error (format "bad NUMEX expression: ~v" e))]))
 
