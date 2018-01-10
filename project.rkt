@@ -141,6 +141,18 @@
            
          (eval-under-env (mlet-e2 e) (cons(cons (mlet-s e) p) env )))
          ]
+
+        [(fun? e)
+         (closure env e)
+         ]
+
+        [(call? e)
+         (let ([actual (eval-under-env (call-actual e) env)]
+               [param (fun-formal (call-funexp e))]
+               [body (fun-body (call-funexp e))])
+
+        (eval-under-env body (cons(cons param actual) env )))
+         ]
         
         ;; CHANGE add more cases here
         [#t (error (format "bad NUMEX expression: ~v" e))]))
