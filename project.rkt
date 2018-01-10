@@ -142,14 +142,27 @@
          (eval-under-env (mlet-e2 e) (cons(cons (mlet-s e) p) env )))
          ]
 
-        [(fun? e)
-         (closure env e)
+        [
+         (fun? e)
+         (let ([p (eval-under-env (mlet-e1 e) env)])
+         (closure env e))
          ]
 
+        [
+         (closure? e)
+         e
+         ]
+
+
+        
         [(call? e)
          (let ([actual (eval-under-env (call-actual e) env)]
-               [param (fun-formal (call-funexp e))]
-               [body (fun-body (call-funexp e))])
+               ;[param (fun-formal (call-funexp e))]
+              ;[body (fun-body (call-funexp e))]
+              ;[cloj (eval-under-env (call-funexp e) ) ]
+              [param (fun-formal(closure-fun(eval-under-env (call-funexp e) env ))) ]
+              [body (fun-body(closure-fun(eval-under-env (call-funexp e) env ))) ])
+      
 
         (eval-under-env body (cons(cons param actual) env )))
          ]
