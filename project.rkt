@@ -44,7 +44,7 @@
 (define (racketlist->numexlist xs)
   (cond 
       [(not(null? xs)) (apair (car xs) (racketlist->numexlist (cdr xs)))]
-      [#t null]
+      [#t (munit)]
   )
 )
 
@@ -74,6 +74,11 @@
 (define (eval-under-env e env)
   (cond [(var? e) 
          (envlookup env (var-string e))]
+
+        [(munit? e)
+         e
+         ]
+
         [(int? e)
          ;; Error handling - Type THREE ;;
          (let ([v (int-num e)])
@@ -117,6 +122,20 @@
                   (int 0))
                (error "NUMEX multiplaction applied to non-number")))]
 
+
+
+
+
+        [(ifgthan? e)
+         (let ([v1 (eval-under-env (ifgthan-e1 e) env)]
+               [v2 (eval-under-env (ifgthan-e2 e) env)])
+           (if (and (int? v1)
+                    (int? v2))
+               (cond [(> (int-num v1) (int-num v2)) (eval-under-env (ifgthan-e3 e) env)]
+                     [else (eval-under-env (ifgthan-e4 e) env)])
+               (error "NUMEX ifgthan applied to non-number")))]
+        
+
         
         [(apair? e)
          e]
@@ -144,8 +163,7 @@
 
         [
          (fun? e)
-         (let ([p (eval-under-env (mlet-e1 e) env)])
-         (closure env e))
+         (closure (cons (cons(fun-nameopt e)(closure env e)) env) e)
          ]
 
         [
@@ -164,7 +182,9 @@
               [body (fun-body(closure-fun(eval-under-env (call-funexp e) env ))) ])
       
 
-        (eval-under-env body (cons(cons param actual) env )))
+        (eval-under-env body (cons(cons param actual) (closure-env(eval-under-env (call-funexp e) env )) ))
+           
+           )
          ]
         
         ;; CHANGE add more cases here

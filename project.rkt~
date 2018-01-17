@@ -63,7 +63,8 @@
 ;; Complete this function
 (define (envlookup env str)
   (cond [(null? env) (error "unbound variable during evaluation" str)]
-  		;"CHANGE" 
+  		[(equal? (car (car env))str) (cdr (car env))]
+                [else (envlookup (cdr env ) str)]
 		))
 
 ;; Do NOT change the two cases given to you.  
@@ -73,6 +74,11 @@
 (define (eval-under-env e env)
   (cond [(var? e) 
          (envlookup env (var-string e))]
+
+        [(munit? e)
+         e
+         ]
+
         [(int? e)
          ;; Error handling - Type THREE ;;
          (let ([v (int-num e)])
@@ -116,6 +122,20 @@
                   (int 0))
                (error "NUMEX multiplaction applied to non-number")))]
 
+
+
+
+
+        [(ifgthan? e)
+(let ([v1 (eval-under-env (ifgthan-e1 e) env)]
+[v2 (eval-under-env (ifgthan-e2 e) env)])
+(if (and (int? v1)
+(int? v2))
+(cond [(> (int-num v1) (int-num v2)) (eval-under-env (ifgthan-e3 e) env)]
+[else (eval-under-env (ifgthan-e4 e) env)])
+(error "NUMEX ifgthan applied to non-number")))]
+        
+
         
         [(apair? e)
          e]
@@ -133,6 +153,39 @@
            (if (apair? p)
                (apair-e2 p)
                (error "NUMEX second applied to non-pair" e)))]
+
+
+        [(mlet? e)
+         (let ([p (eval-under-env (mlet-e1 e) env)])
+           
+         (eval-under-env (mlet-e2 e) (cons(cons (mlet-s e) p) env )))
+         ]
+
+        [
+         (fun? e)
+         (closure (cons (cons(fun-nameopt e)(closure env e)) env) e)
+         ]
+
+        [
+         (closure? e)
+         e
+         ]
+
+
+        
+        [(call? e)
+         (let ([actual (eval-under-env (call-actual e) env)]
+               ;[param (fun-formal (call-funexp e))]
+              ;[body (fun-body (call-funexp e))]
+              ;[cloj (eval-under-env (call-funexp e) ) ]
+              [param (fun-formal(closure-fun(eval-under-env (call-funexp e) env ))) ]
+              [body (fun-body(closure-fun(eval-under-env (call-funexp e) env ))) ])
+      
+
+        (eval-under-env body (cons(cons param actual) (closure-env(eval-under-env (call-funexp e) env )) ))
+           
+           )
+         ]
         
         ;; CHANGE add more cases here
         [#t (error (format "bad NUMEX expression: ~v" e))]))
