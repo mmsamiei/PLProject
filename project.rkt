@@ -146,13 +146,17 @@
          ]
 
         [(ismunit? e)(let ([v1 (eval-under-env (ismunit-e e) env)]) 
-         ( if (munit?  v)(int 1)(int 0)))
+         ( if (munit?  v1)(int 1)(int 0)))
          ]
         
 
         
         [(apair? e)
-         e]
+         (let ([v1 (eval-under-env (apair-e1 e) env)]
+               [v2 (eval-under-env (apair-e2 e) env)])
+           (apair v1 v2)
+          )
+         ]
         
         [(first? e)  
          (let ([p (eval-under-env (first-e e) env)])
