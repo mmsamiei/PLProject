@@ -51,7 +51,7 @@
 
 (define (numexlist->racketlist xs)
   (cond 
-      [(not(null? xs)) (cons (eval-exp(first xs)) (numexlist->racketlist (eval-exp(second xs))))]
+      [(not(munit? xs)) (cons (eval-exp(first xs)) (numexlist->racketlist (eval-exp(second xs))))]
       [#t null]
   )
 )
@@ -134,6 +134,15 @@
                (cond [(> (int-num v1) (int-num v2)) (eval-under-env (ifgthan-e3 e) env)]
                      [else (eval-under-env (ifgthan-e4 e) env)])
                (error "NUMEX ifgthan applied to non-number")))]
+
+
+        [(ifzero? e)
+         (let([v1 (eval-under-env (ifzero-e1 e) env )])
+           ( if ( int? v1) ()
+
+                (error "NUMEX ifzero applied to non-number) )
+          )
+         ]
         
 
         
@@ -163,7 +172,7 @@
 
         [
          (fun? e)
-         (closure (cons (cons(fun-nameopt e)(closure env e)) env) e)
+         (closure env e)
          ]
 
         [
@@ -175,7 +184,8 @@
         
         [(call? e)
          (let ([actual (eval-under-env (call-actual e) env)]
-               ;[param (fun-formal (call-funexp e))]
+               [cloj (eval-under-env (call-funexp e) env) ]
+              ;[param (fun-formal (call-funexp e))]
               ;[body (fun-body (call-funexp e))]
               ;[cloj (eval-under-env (call-funexp e) ) ]
               [param (fun-formal(closure-fun(eval-under-env (call-funexp e) env ))) ]
@@ -183,7 +193,6 @@
       
 
         (eval-under-env body (cons(cons param actual) (closure-env(eval-under-env (call-funexp e) env )) ))
-           
            )
          ]
         
