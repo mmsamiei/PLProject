@@ -138,10 +138,15 @@
 
         [(ifzero? e)
          (let([v1 (eval-under-env (ifzero-e1 e) env )])
-           ( if ( int? v1) ()
-
-                (error "NUMEX ifzero applied to non-number) )
+           ( if ( int? v1)
+                (cond [(equal? 0 (int-num v1)) (eval-under-env (ifzero-e2 e) env)]
+                      [else (eval-under-env (ifzero-e3 e) env)])
+                (error "NUMEX ifzero applied to non-number") )
           )
+         ]
+
+        [(ismunit? e)(let ([v1 (eval-under-env (ismunit-e e) env)]) 
+         ( if (munit?  v)(int 1)(int 0)))
          ]
         
 
