@@ -201,7 +201,7 @@
               [body (fun-body(closure-fun(eval-under-env (call-funexp e) env ))) ])
       
 
-        (eval-under-env body (cons(cons param actual) (closure-env(eval-under-env (call-funexp e) env )) ))
+        (eval-under-env body (cons (cons (fun-nameopt(closure-fun cloj)) cloj )   (cons(cons param actual) (closure-env(eval-under-env (call-funexp e) env )) ) ))
            )
          ]
         
@@ -214,7 +214,7 @@
         
 ;; Problem 3
 
-(define (ifmunit e1 e2 e3) (ifzero(ismunit e1) e3 e2) )
+(define (ifmunit e1 e2 e3) (ifzero( add (ismunit e1) (int -1)) e2 e3) )
 
 (define (mlet* bs e2)(cond
   [(null? bs) e2]
@@ -236,9 +236,14 @@
        )
 )
 
+;(define numex-mapAddN
+;  (mlet "map" numex-map
+;        "CHANGE (notice map is now in NUMEX scope)"))
 (define numex-mapAddN
-  (mlet "map" numex-map
-        "CHANGE (notice map is now in NUMEX scope)"))
+(mlet "map" numex-map
+(fun "mamad" "i"(call (var "map") (fun "inc" "v" (add (var "i") (var "v")))))
+)
+)
 
 ;; Challenge Problem
 
