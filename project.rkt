@@ -214,9 +214,11 @@
         
 ;; Problem 3
 
-(define (ifmunit e1 e2 e3) "CHANGE")
+(define (ifmunit e1 e2 e3) (ifzero(ismunit e1) e3 e2) )
 
-(define (mlet* bs e2) "CHANGE")
+(define (mlet* bs e2)
+  (mlet (car (car bs) ) (cdr (car bs)) (mlet* (cdr bs) e2 ) )
+  )
 
 (define (ifeq e1 e2 e3 e4) "CHANGE")
 
