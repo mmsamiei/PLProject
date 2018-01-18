@@ -216,11 +216,12 @@
 
 (define (ifmunit e1 e2 e3) (ifzero(ismunit e1) e3 e2) )
 
-(define (mlet* bs e2)
-  (mlet (car (car bs) ) (cdr (car bs)) (mlet* (cdr bs) e2 ) )
-  )
+(define (mlet* bs e2)(cond
+  [(null? bs) e2]
+  [ #t (mlet (car (car bs) ) (cdr (car bs)) (mlet* (cdr bs) e2 ) )]
+  ))
 
-(define (ifeq e1 e2 e3 e4) "CHANGE")
+(define (ifeq e1 e2 e3 e4) (ifzero (add e1 (neg e2 )) e3 e4 ))
 
 ;; Problem 4
 
