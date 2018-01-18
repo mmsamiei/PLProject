@@ -51,7 +51,7 @@
 
 (define (numexlist->racketlist xs)
   (cond 
-      [(not(munit? xs)) (cons (eval-exp(first xs)) (numexlist->racketlist (eval-exp(second xs))))]
+      [(not(munit? xs)) (cons (apair-e1 xs) (numexlist->racketlist (apair-e2 xs)))]
       [#t null]
   )
 )
@@ -225,7 +225,16 @@
 
 ;; Problem 4
 
-(define numex-map "CHANGE")
+(define numex-map
+  (fun "a" "func"
+       (fun "b" "lst"
+            (ifmunit (var "lst")
+                     (munit)
+                     (apair (call (var "func") (first (var "lst"))) (call (var "b") (second (var "lst"))))
+                     )
+            )
+       )
+)
 
 (define numex-mapAddN
   (mlet "map" numex-map
